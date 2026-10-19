@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aria | Executive Strategic Advisor</title>
+    <title>Aria | Executive Strategic Advisor - Yara Enterprise</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -52,16 +52,16 @@
                     <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
                         Aria
                         <span class="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                            Executive Advisor
+                            Yara Enterprise
                         </span>
                     </h1>
-                    <p class="text-xs text-slate-400">Senior AI Business & Strategic Consultant</p>
+                    <p class="text-xs text-slate-400">Executive AI Business & Strategic Consultant</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
                 <span class="text-xs font-medium text-slate-400 hidden sm:inline-block bg-slate-900/60 border border-slate-800 px-3 py-1.5 rounded-xl">
-                    <i class="fa-solid fa-globe text-indigo-400 mr-1.5"></i> Sorani Kurdish & Multilingual Support
+                    <i class="fa-solid fa-globe text-indigo-400 mr-1.5"></i> Sorani Kurdish & Multilingual
                 </span>
             </div>
         </div>
@@ -81,9 +81,9 @@
             </div>
 
             <div class="space-y-2 max-w-lg">
-                <h2 class="text-xl sm:text-2xl font-extrabold text-white">Direct Executive Voice Call</h2>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-white">Yara Enterprise Strategic Advisory</h2>
                 <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                    Initiate a real-time voice consultation with Aria to discuss corporate strategy, operational scaling, and business insights.
+                    Initiate a real-time voice consultation with Aria to discuss business development, corporate strategies, and automation solutions.
                 </p>
             </div>
 
@@ -104,22 +104,22 @@
         const VAPI_PUBLIC_KEY = "f9fea749-534d-433c-b3c8-7aadc3f7d104";
         const VAPI_ASSISTANT_ID = "f270f469-319e-4529-83f2-e9674b4518cd";
         let isCallActive = false;
+        let vapiInstance = null;
 
-        // Force strict overrides on the SDK level to guarantee no Farsi/Kurmanji leaks or multi-language start glitches
         const STRICT_ASSISTANT_OVERRIDE = {
-            firstMessage: "Hello, this is Aria. How can I assist with your business strategy today?",
+            firstMessage: "Hello, this is Aria from Yara Enterprise. How can I assist with your business strategy today?",
             model: {
                 messages: [
                     {
                         role: "system",
-                        content: `You are Aria, an elite male business strategist conducting executive consultations.
+                        content: `You are Aria, Senior Business Strategist for Yara Enterprise.
 
 STRICT CONSULTATION & LANGUAGE RULES:
-1. FIRST MESSAGE MANDATE: Start EVERY call strictly with English: "Hello, this is Aria. How can I assist with your business strategy today?"
-2. KURDISH LANGUAGE LOCK: When the caller speaks Kurdish, you MUST reply strictly in native Central Sorani Kurdish script (سۆڕانی پاك بە ئەلفوبێی کوردی - ئارامی وەک: سڵاو، چۆنیت، فەرموو).
-3. ABSOLUTE ZERO FARSI/PERSIAN: Never use Farsi words or expressions (like "مرسی", "سلام", "شما", "است"). Stick 100% to clean Sorani business vocabulary.
-4. LANGUAGE STABILITY: Once a user starts speaking Sorani Kurdish, LOCK into Sorani Kurdish for all remaining turns. DO NOT switch back to English mid-conversation unless the user explicitly speaks English.
-5. NO BULLET POINTS / NO FORMATTING: Keep each reply short and concise (1 to 3 natural sentences max). Never list bullet points or long numbers so audio streaming remains completely smooth without connection drops.`
+1. FIRST MESSAGE MANDATE: Start EVERY call strictly with English: "Hello, this is Aria from Yara Enterprise. How can I assist with your business strategy today?"
+2. KURDISH LANGUAGE LOCK: When the caller speaks Kurdish, reply strictly in native Central Sorani Kurdish script (سۆڕانی پاك بە ئەلفوبێی کوردی).
+3. ABSOLUTE ZERO FARSI/PERSIAN: Never use Farsi words. Stick 100% to clean Sorani business vocabulary.
+4. LANGUAGE STABILITY: Once a user starts speaking Sorani Kurdish, LOCK into Sorani Kurdish for all remaining turns.
+5. NO BULLET POINTS / NO FORMATTING: Keep each reply short and concise (1 to 3 natural sentences max).`
                     }
                 ]
             }
@@ -134,21 +134,34 @@ STRICT CONSULTATION & LANGUAGE RULES:
                     <span class="text-amber-400">Connecting to Aria...</span>
                 `;
 
-                if (window.vapiSDK) {
-                    try {
-                        window.vapiSDK.run({
+                try {
+                    if (window.vapiSDK) {
+                        vapiInstance = window.vapiSDK.run({
                             apiKey: VAPI_PUBLIC_KEY,
                             assistant: VAPI_ASSISTANT_ID,
                             assistantOverrides: STRICT_ASSISTANT_OVERRIDE
                         });
-                        updateCallUI(true);
-                    } catch (e) {
-                        console.error("Vapi call execution failed:", e);
+
+                        if (vapiInstance) {
+                            vapiInstance.on('call-start', () => updateCallUI(true));
+                            vapiInstance.on('call-end', () => updateCallUI(false));
+                            vapiInstance.on('error', (e) => {
+                                console.error("Vapi Error:", e);
+                                updateCallUI(false);
+                            });
+                        } else {
+                            updateCallUI(true);
+                        }
                     }
+                } catch (e) {
+                    console.error("Vapi call execution failed:", e);
+                    updateCallUI(false);
                 }
             } else {
                 if (window.vapiSDK && window.vapiSDK.stop) {
                     window.vapiSDK.stop();
+                } else if (vapiInstance && vapiInstance.stop) {
+                    vapiInstance.stop();
                 }
                 updateCallUI(false);
             }
