@@ -126,6 +126,10 @@
                     <a href="https://poe.com/Aria_Yara" target="_blank" class="bg-gold-500 hover:bg-gold-400 text-navy-900 font-bold px-6 py-3.5 rounded-xl transition-all inline-flex items-center gap-2">
                         <i class="fa-solid fa-paper-plane"></i> Launch Aria Chat
                     </a>
+                    <!-- Interactive Voice Call Button Integration -->
+                    <button id="vapi-call-btn" onclick="toggleVapiCall()" class="bg-emerald-500 hover:bg-emerald-400 text-navy-900 font-bold px-6 py-3.5 rounded-xl transition-all inline-flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                        <i class="fa-solid fa-phone-volume animate-pulse"></i> Call Aria Now (Voice)
+                    </button>
                     <a href="https://buy.stripe.com/test_4gM8wRc5792QfQieCF3Nm00" target="_blank" class="bg-slate-900/80 border border-slate-700 hover:bg-slate-900 text-white font-medium px-6 py-3.5 rounded-xl transition-all">
                         Pay Retainer Fee ($500)
                     </a>
@@ -149,5 +153,40 @@
         </div>
     </footer>
 
+    <!-- Vapi AI Web WebSDK Integration Script -->
+    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+    <script>
+        // Real Vapi credentials integrated
+        const VAPI_PUBLIC_KEY = "f9fea749-534d-433c-b3c8-7aadc3f7d104"; 
+        const VAPI_ASSISTANT_ID = "f270f469-319e-4529-83f2-e9674b4518cd"; 
+
+        let vapiInstance = null;
+        let isCalling = false;
+
+        function toggleVapiCall() {
+            const btn = document.getElementById('vapi-call-btn');
+
+            if (!vapiInstance) {
+                vapiInstance = window.vapiSDK.run({
+                    apiKey: VAPI_PUBLIC_KEY,
+                    assistantId: VAPI_ASSISTANT_ID
+                });
+            }
+
+            if (!isCalling) {
+                vapiInstance.start();
+                btn.innerHTML = `<i class="fa-solid fa-phone-slash animate-bounce"></i> End Call`;
+                btn.classList.remove('bg-emerald-500', 'hover:bg-emerald-400');
+                btn.classList.add('bg-rose-600', 'hover:bg-rose-500', 'text-white');
+                isCalling = true;
+            } else {
+                vapiInstance.stop();
+                btn.innerHTML = `<i class="fa-solid fa-phone-volume animate-pulse"></i> Call Aria Now (Voice)`;
+                btn.classList.remove('bg-rose-600', 'hover:bg-rose-500', 'text-white');
+                btn.classList.add('bg-emerald-500', 'hover:bg-emerald-400', 'text-navy-900');
+                isCalling = false;
+            }
+        }
+    </script>
 </body>
 </html>
